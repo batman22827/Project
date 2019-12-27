@@ -44,7 +44,7 @@ void loop()
 
       // Считываем адрес
       if (rfid.readCardSerial()) {
-        delay(50);
+
         // Выводим его в порт в десятичном представлении
       }
     }
@@ -55,7 +55,7 @@ void loop()
         IM = "Илья";
         KL = klass[9];
         BK = bykva[0];
-        delay(50);
+
 
         Serial.println("===========================================================================");
         Serial.println(" ");
@@ -68,14 +68,14 @@ void loop()
         Serial.println("");
         Serial.println("");
         Serial.println("===========================================================================");
-        delay(50);
+
         rfid.serNum[0] = 0;
         rfid.serNum[1] = 100;
         i1++;
         k++;
       }
     }
-    delay(50);
+
 
     if (rfid.serNum[0] == UID[1] and i2 < 2 ) {
       while (rfid.serNum[0] == UID[1] and i2 < 2) {
@@ -94,7 +94,7 @@ void loop()
         Serial.println("");
         Serial.println("");
         Serial.println("===========================================================================");
-        delay(50);
+
         rfid.serNum[0] = 0;
         rfid.serNum[1] = 100;
         i2++;
@@ -109,19 +109,22 @@ void loop()
           Serial.println("===========================================================================");
           Serial.println("Данная карта уже зарегистрирована сегодня");
           Serial.println("===========================================================================");
-          delay(50);
+
           rfid.serNum[0] = 0;
         }
       }
     }
     if (millis() - myTimer1 >= 15000) {
-      delay(50);
+      Serial.println(" ");
+      Serial.println(" ");
+     
+
+
       Serial.println("===========================================================================");
       Serial.println("Всего учеников пришло:");
       Serial.print(k);
       Serial.println("");
-      Serial.println("");
-      delay(50);
+
       Serial.println("===========================================================================");
       if (serNum1 < 100 and i1 == 1) {
         vg0++;
@@ -130,22 +133,20 @@ void loop()
         vg1++;
       }
       Serial.println("Ученики, которые не пришли:");
-      Serial.println(" ");
       if (serNum1 < 100 and i1 == 1) {
         Serial.println("Демченко Илья");
         Serial.println("Дней пропущено:");
-        Serial.println("");
         Serial.print(vg0);
         Serial.println("");
         Serial.println("===========================================================================");
+
       }
       if (serNum1 < 100 and i2 == 1) {
-        Serial.println("===========================================================================");
+
         Serial.println("Петров Василий");
         Serial.println("Дней пропущено:");
-        Serial.print("");
         Serial.print(vg1);
-        
+
         Serial.println("");
         Serial.println("===========================================================================");
       }
