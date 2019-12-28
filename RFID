@@ -5,8 +5,6 @@
 #define RST_PIN 9
 RFID rfid(SS_PIN, RST_PIN);
 uint32_t myTimer1; //Таймер
-char target[] = "mute" ;
-char unmute[] = "unmute";
 int dinam = 3;
 int zvyk = 1;
 int serNum0;
@@ -124,11 +122,25 @@ if (rfid.serNum[0] == UID[1] and i2 < 2 ) {
       Serial.println("===========================================================================");
 
       rfid.serNum[0] = 0;
+      delay(150);
     }
   }
 }
 
-if (millis() - myTimer1 >= 15000) {
+
+
+
+
+if (rfid.serNum[0] != UID[0 or 1] and rfid.serNum[0] > 1) {
+  while (rfid.serNum[0] != UID[0 or 1] and rfid.serNum[0] > 1) {
+    tone(dinam, 1700,50);
+    Serial.println("===========================================================================");
+    Serial.println("Данной карты не обнаружено в системе") ;
+    Serial.println("===========================================================================");
+    rfid.serNum[0]=1;
+  }
+}
+if (millis() - myTimer1 > 65000) {
 
   Serial.println(" ");
   Serial.println(" ");
@@ -172,16 +184,6 @@ if (millis() - myTimer1 >= 15000) {
   i2 = 1;
   myTimer1 = millis();
 
-
-}
-if (rfid.serNum[0] != UID[0 or 1] and rfid.serNum[0] > 1) {
-  while (rfid.serNum[0] != UID[0 or 1] and rfid.serNum[0] > 1) {
-    tone(dinam, 1700,50);
-    Serial.println("===========================================================================");
-    Serial.println("Данной карты не обнаружено в системе") ;
-    Serial.println("===========================================================================");
-    rfid.serNum[0]=1;
-  }
 }
 }
 
