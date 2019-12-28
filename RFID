@@ -127,14 +127,11 @@ if (rfid.serNum[0] == UID[1] and i2 < 2 ) {
     }
   }
 }
+
 if (millis() - myTimer1 >= 15000) {
 
   Serial.println(" ");
   Serial.println(" ");
-
-  
-  
-
 
 
   Serial.println("===========================================================================");
@@ -177,12 +174,14 @@ if (millis() - myTimer1 >= 15000) {
 
 
 }
-if (rfid.serNum[0] != UID[0 or 1 ] and rfid.serNum[0] > 0) {
-  while (rfid.serNum[0] != UID[0 or 1 ] and rfid.serNum[0] > 0) {
-    tone(dinam, 1700);
+if (rfid.serNum[0] != UID[0 or 1] and rfid.serNum[0] > 0) {
+  while (rfid.serNum[0] != UID[0 or 1] and rfid.serNum[0] > 0) {
+    tone(dinam, 1700,50);
     Serial.println("===========================================================================");
     Serial.println("Данной карты не обнаружено в системе") ;
     Serial.println("===========================================================================");
+    rfid.serNum[0]=0;
   }
 }
 }
+
