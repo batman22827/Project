@@ -6,6 +6,9 @@
 #define RST_PIN 9
 RFID rfid(SS_PIN, RST_PIN);
 uint32_t myTimer1; //Таймер
+char target[] = "mute";
+int dinam = 3;
+int zvyk = 1;
 int serNum0;
 int serNum1;
 int klass[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}; //0,1,2,3,4,5,6,7,8,9,10,11,12
@@ -30,136 +33,173 @@ String FAM;
 void setup()
 {
   Serial.begin(9600);
-
   SPI.begin();
   rfid.init();
+  Serial.read();
+
 }
 
 void loop()
 {
+ 
+  if (Serial.available() > 0) {
+    if (Serial.find(target)){
+      zvyk = 0;
+    }
+  }
 
   // Если обнаружена карта
   {
     if (rfid.isCard()) {
-      delay(300);
+      delay(250);
 
       // Считываем адрес
       if (rfid.readCardSerial()) {
+
 
         // Выводим его в порт в десятичном представлении
       }
     }
     rfid.halt();
-    if (rfid.serNum[0] == UID[0] and i1 < 2) {
-      while (rfid.serNum[0] == UID[0] and i1 < 2) {
-        FAM = "Демченко";
-        IM = "Илья";
-        KL = klass[9];
-        BK = bykva[0];
 
+  }
+  if (rfid.serNum[0] == UID[0] and i1 < 2) {
+    while (rfid.serNum[0] == UID[0] and i1 < 2) {
+      FAM = "Демченко";
+      IM = "Илья";
+      KL = klass[9];
+      BK = bykva[0];
 
-        Serial.println("===========================================================================");
-        Serial.println(" ");
-        Serial.print(FAM);
-        Serial.print(" ");
-        Serial.print(IM);
-        Serial.print(" ");
-        Serial.print(KL);
-        Serial.println(BK);
-        Serial.println("");
-        Serial.println("");
-        Serial.println("===========================================================================");
-
-        rfid.serNum[0] = 0;
-        rfid.serNum[1] = 100;
-        i1++;
-        k++;
-      }
-    }
-
-
-    if (rfid.serNum[0] == UID[1] and i2 < 2 ) {
-      while (rfid.serNum[0] == UID[1] and i2 < 2) {
-        FAM = "Петров" ;
-        IM = "Василий";
-        KL = klass[5];
-        BK = bykva[1];
-        Serial.println("===========================================================================");
-        Serial.println(" ");
-        Serial.print(FAM);
-        Serial.print(" ");
-        Serial.print(IM);
-        Serial.print(" ");
-        Serial.print(KL);
-        Serial.print(BK);
-        Serial.println("");
-        Serial.println("");
-        Serial.println("===========================================================================");
-
-        rfid.serNum[0] = 0;
-        rfid.serNum[1] = 100;
-        i2++;
-        k++;
-
-      }
-
-    }
-    {
-      if (rfid.serNum[0] == UID[0] and i1 == 2 || rfid.serNum[0] == UID[1] and i2 == 2) {
-        while (rfid.serNum[0] == UID[0] and i1 == 2 || rfid.serNum[0] == UID[1] and i2 == 2) {
-          Serial.println("===========================================================================");
-          Serial.println("Данная карта уже зарегистрирована сегодня");
-          Serial.println("===========================================================================");
-
-          rfid.serNum[0] = 0;
-        }
-      }
-    }
-    if (millis() - myTimer1 >= 15000) {
-      Serial.println(" ");
-      Serial.println(" ");
-     
-
-
+      tone(dinam, 659, 300);
       Serial.println("===========================================================================");
-      Serial.println("Всего учеников пришло:");
-      Serial.print(k);
+      Serial.println(" ");
+      Serial.print(FAM);
+      Serial.print(" ");
+      Serial.print(IM);
+      Serial.print(" ");
+      Serial.print(KL);
+      Serial.println(BK);
       Serial.println("");
-
+      Serial.println("");
       Serial.println("===========================================================================");
-      if (serNum1 < 100 and i1 == 1) {
-        vg0++;
-      }
-      if (serNum1 < 100 and i2 == 1) {
-        vg1++;
-      }
-      Serial.println("Ученики, которые не пришли:");
-      if (serNum1 < 100 and i1 == 1) {
-        Serial.println("Демченко Илья");
-        Serial.println("Дней пропущено:");
-        Serial.print(vg0);
-        Serial.println("");
+
+      rfid.serNum[0] = 0;
+      rfid.serNum[1] = 100;
+      i1++;
+      k++;
+    }
+  }
+
+
+  if (rfid.serNum[0] == UID[1] and i2 < 2 ) {
+    while (rfid.serNum[0] == UID[1] and i2 < 2) {
+      FAM = "Петров" ;
+      IM = "Василий";
+      KL = klass[5];
+      BK = bykva[1];
+      Serial.println("===========================================================================");
+      Serial.println(" ");
+      Serial.print(FAM);
+      Serial.print(" ");
+      Serial.print(IM);
+      Serial.print(" ");
+      Serial.print(KL);
+      Serial.print(BK);
+      Serial.println("");
+      Serial.println("");
+      Serial.println("===========================================================================");
+      tone(dinam, 784, 150);
+      rfid.serNum[0] = 0;
+      rfid.serNum[1] = 100;
+      i2++;
+      k++;
+
+    }
+
+  }
+  {
+    if (rfid.serNum[0] == UID[0] and i1 == 2 || rfid.serNum[0] == UID[1] and i2 == 2) {
+      while (rfid.serNum[0] == UID[0] and i1 == 2 || rfid.serNum[0] == UID[1] and i2 == 2) {
+        tone(dinam, 1014, 50);
+        Serial.println("===========================================================================");
+        Serial.println("Данная карта уже зарегистрирована сегодня");
         Serial.println("===========================================================================");
 
+        rfid.serNum[0] = 0;
       }
-      if (serNum1 < 100 and i2 == 1) {
+    }
+  }
+  if (millis() - myTimer1 >= 15000) {
+  
+    Serial.println(" ");
+    Serial.println(" ");
 
-        Serial.println("Петров Василий");
-        Serial.println("Дней пропущено:");
-        Serial.print(vg1);
+     if (zvyk>0){
+    tone(dinam, 1318, 150);
+    delay(150);
+    tone(dinam, 1318, 300);
+    delay(300);
+    tone(dinam, 1318, 150);
+    delay(300);
+    tone(dinam, 1046, 150);
+    delay(150);
+    tone(dinam, 1318, 300);
+    delay(300);
+    tone(dinam, 1568, 600);
+    delay(600);
+    tone(dinam, 784, 600);
+    delay(600);
+     }
 
-        Serial.println("");
-        Serial.println("===========================================================================");
-      }
 
 
 
-      k = 0;
-      i1 = 1;
-      i2 = 1;
-      myTimer1 = millis();
+    Serial.println("===========================================================================");
+    Serial.println("Всего учеников пришло:");
+    Serial.print(k);
+    Serial.println("");
+
+    Serial.println("===========================================================================");
+    if (serNum1 < 100 and i1 == 1) {
+      vg0++;
+    }
+    if (serNum1 < 100 and i2 == 1) {
+      vg1++;
+    }
+    Serial.println("Ученики, которые не пришли:");
+    if (serNum1 < 100 and i1 == 1) {
+      Serial.println("Демченко Илья");
+      Serial.println("Дней пропущено:");
+      Serial.print(vg0);
+      Serial.println("");
+      Serial.println("===========================================================================");
+
+    }
+    if (serNum1 < 100 and i2 == 1) {
+
+      Serial.println("Петров Василий");
+      Serial.println("Дней пропущено:");
+      Serial.print(vg1);
+
+      Serial.println("");
+      Serial.println("===========================================================================");
+    }
 
 
+
+    k = 0;
+    i1 = 1;
+    i2 = 1;
+    myTimer1 = millis();
+
+
+  }
+  if (rfid.serNum[0] != UID[0 or 1 ] and rfid.serNum[0] > 0) {
+    while (rfid.serNum[0] != UID[0 or 1 ] and rfid.serNum[0] > 0) {
+      tone(dinam, 1700);
+      Serial.println("===========================================================================");
+      Serial.println("Данной карты не обнаружено в системе") ;
+      Serial.println("===========================================================================");
     }
   }
 }
