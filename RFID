@@ -1,22 +1,24 @@
+// version 1.1
+
+
 //BACKUP
 
-
-// version 1.1
-
-
 // Тестировалось на Arduino IDE 1.0.1
 #include <SPI.h>
 #include "DHT.h" // подключаем библиотеку
 #include <RFID.h>
+#include <EEPROM.h>
 #define SS_PIN 10
 #define RST_PIN 9
 #define DHTPIN 6
 #define DHTTYPE DHT11
 RFID rfid(SS_PIN, RST_PIN);
 uint32_t myTimer1; //Таймер
+uint32_t myTimer2; //Таймер
 int dinam = 3;
 int zvyk = 1;
 int serNum0;
+int hes;
 int serNum1;
 int klass[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}; //0,1,2,3,4,5,6,7,8,9,10,11,12
 int KL;
@@ -27,6 +29,7 @@ int UID[] = {199, 89}; //Верные айди
 int vg[] = {0, 0}; //Пропуски
 int vg0;
 int vg1;
+int kol1;
 const char *bykva[]  = {
   "А",   // 0
   "Б",     // 1
@@ -45,6 +48,9 @@ void setup()
   SPI.begin();
   rfid.init();
   Serial.read();
+  vg0 = EEPROM.read(0);
+  vg1 = EEPROM.read(1);
+
 
 }
 
@@ -52,251 +58,7 @@ void setup()
 void loop()
 {
 
-
-
-  // Если обнаружена карта
-  {
-    if (rfid.isCard()) {
-      delay(250);
-
-      // Считываем адрес
-      if (rfid.readCardSerial()) {
-  
-
-        // Выводим его в порт в десятичном представлении
-      }
-    }
-    rfid.halt();
-
-  }
-  if (rfid.serNum[0] == UID[0] and i1 == 0) {
-    while (rfid.serNum[0] == UID[0] and i1 == 0) {
-      FAM = "Демченко";
-      IM = "Илья";
-      KL = klass[9];
-      BK = bykva[0];
-
-      tone(dinam, 659, 300);
-      Serial.println("===========================================================================");
-      Serial.println(" ");
-      Serial.print(FAM);
-      Serial.print(" ");
-      Serial.print(IM);
-      Serial.print(" ");
-      Serial.print(KL);
-      Serial.println(BK);
-      Serial.println("");
-      Serial.println("");
-      Serial.println("===========================================================================");
-
-      rfid.serNum[0] = 0;
-      rfid.serNum[1] = 100;
-      rfid.serNum[2] = 1;
-      i1++;
-      k++;
-    }
-  }
-
-
-
-  if (rfid.serNum[0] == UID[1] and i2 == 1 ) {
-    while (rfid.serNum[0] == UID[1] and i2 == 1) {
-      FAM = "Петров" ;
-      IM = "Василий";
-      KL = klass[5];
-      BK = bykva[1];
-      Serial.println("===========================================================================");
-      Serial.println(" ");
-      Serial.print(FAM);
-      Serial.print(" ");
-      Serial.print(IM);
-      Serial.print(" ");
-      Serial.print(KL);
-      Serial.print(BK);
-      Serial.println("");
-      Serial.println("");
-      Serial.println("===========================================================================");
-      tone(dinam, 784, 150);
-      rfid.serNum[0] = 0;
-      rfid.serNum[1] = 100;
-      i2++;
-      k++;
-
-    }
-
-  }
-  {
-    if (rfid.serNum[0] == UID[0] and i1 ==1 || rfid.serNum[0] == UID[1] and i2 == 1) {
-      while (rfid.serNum[0] == UID[0] and i1 == 1 || rfid.serNum[0] == UID[1] and i2 == 1) {
-        tone(dinam, 1014, 50);
-        Serial.println("===========================================================================");
-        Serial.println("Данная карта уже зарегистрирована сегодня");
-        Serial.println("===========================================================================");
-
-        rfid.serNum[0] = 0;
-        delay(150);
-      }
-    }
-  }
-
-
-
-
-
-  if (rfid.serNum[0] != UID[0 or 1] and rfid.serNum[0] > 2) {
-    while (rfid.serNum[0] != UID[0 or 1] and rfid.serNum[0] > 2) {
-      tone(dinam, 1700, 50);
-      Serial.println("===========================================================================");
-      Serial.println("Данной карты не обнаружено в системе") ;
-      Serial.println("===========================================================================");
-      rfid.serNum[0] = 0;
-    }
-  }
-  if (millis() - myTimer1 > 15000) {
-    Serial.println("===========================================================================");
-    float h = dht.readHumidity(); // считываем влажность
-    float t = dht.readTemperature(); // считываем температуру
-    // в градусах Цельсия
-
-    // проверяем полученные значения
-    if (isnan(h) || isnan(t)) {
-      Serial.println("Ошибка чтения датчика");
-      return;
-    }
-
-
-    // выводим полученные данные в консоль
-
-
-if(vg>0){
-    Serial.println(" ");
-    Serial.println(" ");
-    Serial.println("===========================================================================");
-
-
-    Serial.println("===========================================================================");
-    Serial.println("Всего учеников пришло:");
-    Serial.print(k);
-    Serial.println("");
-    Serial.println("Ученики, которые пришли:");
-    }
-
-    Serial.println("===========================================================================");
-
-    if (serNum1 < 100 and i1 == 0) {
-      vg0++;
-    }
-    if (serNum1 < 100 and i2 == 0) {
-      vg1++;
-    }
-    if(vg0>0 or vg1>0){
-      Serial.println("Ученики, которые не пришли:");
-    }
-    if (serNum1 < 100 and i1 == 0) {
-      Serial.println("Демченко Илья");
-      Serial.println("Дней пропущено:");
-      Serial.print(vg0);
-
-
-      Serial.println("===========================================================================");
-
-    }
-    if (serNum1 < 100 and i2 == 0) {
-
-      Serial.println("Петров Василий");
-      Serial.println("Дней пропущено:");
-
-      Serial.print(vg1);
-
-      Serial.println("");
-      Serial.println("===========================================================================");
-    }
-
-
-    Serial.println("");
-    Serial.print("Влажность : ");
-    Serial.println(h);
-    Serial.print("Температура: ");
-    Serial.print(t);
-    Serial.print(" *C, ");
-    if (t < 17) {
-      Serial.println("");
-      Serial.println("Низкая температура");
-      tone(dinam, 514, 450);
-    }
-
-    
-    k = 0;
-    i1 = 1;
-    i2 = 1;
-    myTimer1 = millis();
-    }
-
-}
-  
-
-
-
-
-
-
-
-
-
-
-
-
-// version 1.1
-
-
-// Тестировалось на Arduino IDE 1.0.1
-#include <SPI.h>
-#include "DHT.h" // подключаем библиотеку
-#include <RFID.h>
-#define SS_PIN 10
-#define RST_PIN 9
-#define DHTPIN 6
-#define DHTTYPE DHT11
-RFID rfid(SS_PIN, RST_PIN);
-uint32_t myTimer1; //Таймер
-int dinam = 3;
-int zvyk = 1;
-int serNum0;
-int serNum1;
-int klass[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}; //0,1,2,3,4,5,6,7,8,9,10,11,12
-int KL;
-int i1 = 0;//Круг первого
-int i2 = 0;//Круг второго
-int k = 0;//Количество учеников
-int UID[] = {199, 89}; //Верные айди
-int vg[] = {0, 0}; //Пропуски
-int vg0;
-int vg1;
-const char *bykva[]  = {
-  "А",   // 0
-  "Б",     // 1
-  "В",     // 2
-};
-
-String IM;
-String BK;
-String FAM;
-
-DHT dht(DHTPIN, DHTTYPE);
-void setup()
-{
-  Serial.begin(9600);
-  dht.begin(); // запускаем датчик
-  SPI.begin();
-  rfid.init();
-  Serial.read();
-
-}
-
-
-void loop()
-{
-
+  Serial.print("");
 
 
   // Если обнаружена карта
@@ -314,6 +76,7 @@ void loop()
     rfid.halt();
 
   }
+
   if (rfid.serNum[0] == UID[0] and i1 == 0) {
     while (rfid.serNum[0] == UID[0] and i1 == 0) {
       FAM = "Демченко";
@@ -372,10 +135,9 @@ void loop()
 
   }
   {
-    if (rfid.serNum[0] == UID[0] and i1 == 1 or rfid.serNum[0] == UID[1] and i2 == 1) {
-      while (rfid.serNum[0] == UID[0] and i1 == 1 or rfid.serNum[0] == UID[1] and i2 == 1) {
+    if (rfid.serNum[0] == UID[0] and i1 == 1 || rfid.serNum[0] == UID[1] and i2 == 1) {
+      while (rfid.serNum[0] == UID[0] and i1 == 1 || rfid.serNum[0] == UID[1] and i2 == 1) {
         tone(dinam, 1014, 50);
-        Serial.println(" ");
         Serial.println("===========================================================================");
         Serial.println("Данная карта уже зарегистрирована сегодня");
         Serial.println("===========================================================================");
@@ -385,6 +147,7 @@ void loop()
       }
     }
   }
+
 
 
 
@@ -402,7 +165,7 @@ void loop()
   }
 
 
-  if (millis() - myTimer1 > 15000) {
+  if (millis() - myTimer1 > 5500) {
     Serial.println("===========================================================================");
     float h = dht.readHumidity(); // считываем влажность
     float t = dht.readTemperature(); // считываем температуру
@@ -428,41 +191,42 @@ void loop()
       Serial.println("Всего учеников пришло:");
       Serial.print(k);
       Serial.println("");
-      Serial.println("Ученики, которые пришли:");
     }
 
     Serial.println("===========================================================================");
 
-    if (serNum1 == 0  and i1 == 0) {
-      vg0++;
-    }
-    if (serNum1 == 0 and i2 == 0) {
-      vg1++;
-    }
-    if (vg0 > 0 or vg1 > 0) {
+    if (i1 == 0  or i2 == 0 ) {
       Serial.println("Ученики, которые не пришли:");
+
+
+
     }
     if (serNum1 == 0  and i1 == 0) {
+      EEPROM.update(0, vg0 + 1);
+
+
       Serial.println("Демченко Илья");
       Serial.println("Дней пропущено:");
-      Serial.println(vg0);
+      Serial.println(EEPROM.read(0));
+      vg0++;
       Serial.println("");
       Serial.println("===========================================================================");
-    }
 
+    }
 
 
     if (serNum1 == 0  and i2 == 0) {
+      EEPROM.update(1, vg1 + 1);
+
 
       Serial.println("Петров Василий");
       Serial.println("Дней пропущено:");
-      Serial.println(vg1);
+      Serial.println(EEPROM.read(1));
+      vg1++;
       Serial.println("");
       Serial.println("===========================================================================");
+
     }
-
-
-
 
 
     Serial.println("");
@@ -478,21 +242,28 @@ void loop()
     }
 
 
-
     k = 0;
-    i1 = 1;
-    i2 = 1;
+    i1 = 0;
+    i2 = 0;
     myTimer1 = millis();
   }
+  if (millis() - myTimer2 > 105500) {
+    Serial.println("===========================================================================");
+    Serial.println("");
+    Serial.println("СБРОС ДАННЫХ О ПРОПУСКАХ");
+    Serial.println("СБРОС ДАННЫХ О ПРОПУСКАХ");
+    Serial.println("СБРОС ДАННЫХ О ПРОПУСКАХ");
+    Serial.println("");
+    Serial.println("===========================================================================");
 
+    vg0 = 0;
+    vg1 = 0;
+    delay(200);
+    myTimer2 = millis();
+  }
+
+  Serial.print("");
 }
-
-
-
-
-
-  
-
 
 
 
