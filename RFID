@@ -18,15 +18,12 @@ uint32_t myTimer4 = 15000 ; //Таймер
 int dinam = 3;
 int serNum0;
 int serNum1;
-int klass[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}; //0,1,2,3,4,5,6,7,8,9,10,11,12
-int ky[] = {0, 0}; //Утренние ученики
+int ky; //Утренние ученики
 int pg[] {0, 0}; //Сбежавшие ученики
 int kv[] = {0, 0};//Вечерние ученики
-int KL;
 int i[] {0, 0}; //Круг утренних карточек
-int vx[] {0, 0};
-int k1[]{0,0} ;//Количество утрнних  учеников
-int k2[] {0,1}; //Количество вечерних учеников
+int vx[] {0, 0}; //Кол-во считываний для выхода из системы
+int kc;
 int UID[] = {199, 89}; //Верные айди
 int vg[] = {0, 0}; //Пропуски
 int vg0;
@@ -41,9 +38,11 @@ const char *bykva[]  = {
   "В",     // 2
 };
 
-String IM;
-String BK;
-String FAM;
+const char *ych[] = {
+  "Демченко Илья Евгеньевич 10 А",
+  "Петров Василий Михайлович 6 Б ",
+};
+
 
 DHT dht(DHTPIN, DHTTYPE);
 void setup()
@@ -55,8 +54,6 @@ void setup()
   Serial.read();
   vg0 = EEPROM.read(0);
   vg1 = EEPROM.read(1);
-
-
 }
 
 
@@ -67,7 +64,7 @@ void loop()
   // Если обнаружена карта
   {
     if (rfid.isCard()) {
-      delay(500);
+      delay(200);
 
       // Считываем адрес
       if (rfid.readCardSerial()) {
@@ -77,27 +74,21 @@ void loop()
       }
     }
     rfid.halt();
-
   }
+
+
 
   if (rfid.serNum[0] == UID[0] and i[0] == 0) {
     while (rfid.serNum[0] == UID[0] and i[0] == 0) {
-      FAM = "Демченко";
-      IM = "Илья";
-      KL = klass[9];
-      BK = bykva[0];
+
+
 
       tone(dinam, 659, 300);
       Serial.println(" ");
       Serial.println("===========================================================================");
       Serial.println(" ");
-      Serial.println("Пришел на объект:");
-      Serial.print(FAM);
-      Serial.print(" ");
-      Serial.print(IM);
-      Serial.print(" ");
-      Serial.print(KL);
-      Serial.println(BK);
+      Serial.println("Занесен в систему");
+      Serial.println(ych[0]);
       Serial.println("");
       Serial.println("");
       Serial.println("===========================================================================");
@@ -105,53 +96,38 @@ void loop()
       rfid.serNum[0] = 0;
       rfid.serNum[1] = 100;
       i[0]++;
-      ky[0]++;
+      kc++;
       vx[0] = 1;
-      if(k1[0]=0){
-      k1[0]++;
-      }
+      ky++;
     }
   }
+
+
+
 
 
 
   if (rfid.serNum[0] == UID[1] and i[1] == 0 ) {
     while (rfid.serNum[0] == UID[1] and i[1] == 0) {
-      FAM = "Петров" ;
-      IM = "Василий";
-      KL = klass[5];
-      BK = bykva[1];
+
       Serial.println(" ");
       Serial.println("===========================================================================");
       Serial.println(" ");
-      Serial.println("Пришел на объект:");
-      Serial.print(FAM);
-      Serial.print(" ");
-      Serial.print(IM);
-      Serial.print(" ");
-      Serial.print(KL);
-      Serial.println(BK);
-      Serial.println("");
-      Serial.println("");
+      Serial.println("Занесен в систему:");
+      Serial.println(ych[1]);
       Serial.println("===========================================================================");
       tone(dinam, 784, 150);
       rfid.serNum[0] = 0;
       rfid.serNum[1] = 100;
       i[1]++;
-      ky[1]++;
+      ky++;
       vx[1] = 1;
-
     }
-
   }
 
-  
-
-   
 
 
-    
-  
+
 
 
 
@@ -161,10 +137,8 @@ void loop()
     Serial.println("УТРЕННИЙ ОТЧЕТ");
     Serial.println("УТРЕННИЙ ОТЧЕТ");
 
-
     float h = dht.readHumidity(); // считываем влажность
     float t = dht.readTemperature(); // считываем температуру
-
 
     if (t <= 20) {
       Serial.println("Низкая температура");
@@ -194,28 +168,39 @@ void loop()
     // выводим полученные данные в консоль
 
 
+
+
     Serial.println(" ");
     Serial.println(" ");
     Serial.println("===========================================================================");
 
 
     Serial.println("===========================================================================");
-    if (k1[0,1] > 0) {
+    if (ky > 0) {
       Serial.println("Всего учеников пришло:");
-      Serial.print(k1[0+1]);
+      Serial.println(ky);
       Serial.println("");
-      if (i[0] == 1) {
-        Serial.println("Демченко Илья");
+      Serial.println("Ученики, которые пришли:");
+      if (vx[0] > 0) {
+        Serial.println(ych[0]);
       }
-      if (i[1] == 1) {
-        Serial.println("Петров Василий");
+      if (vx[1] > 0) {
+        Serial.println(ych[1]);
       }
+
     }
 
+
     Serial.println("===========================================================================");
 
-    if (i[0] == 0  or i[1] == 0 ) {
+    if (vx[0] == 0  or vx[1] == 0 ) {
       Serial.println("Ученики, которые не пришли:");
+      if (vx[0 == 0 ]) {
+        Serial.println(ych[0]);
+      }
+      if (vx[1] == 0) {
+        Serial.println(ych[1]);
+      }
 
 
 
@@ -223,8 +208,8 @@ void loop()
     if (serNum1 == 0  and i[0] == 0) {
       EEPROM.update(0, vg0 + 1);
 
-
-      Serial.println("Демченко Илья");
+      Serial.println("");
+      Serial.println(ych[0]);
       Serial.println("Дней пропущено:");
       Serial.println(EEPROM.read(0));
       vg0++;
@@ -238,7 +223,7 @@ void loop()
       EEPROM.update(1, vg1 + 1);
 
 
-      Serial.println("Петров Василий");
+      Serial.println(ych[1]);
       Serial.println("Дней пропущено:");
       Serial.println(EEPROM.read(1));
       vg1++;
@@ -255,25 +240,105 @@ void loop()
     Serial.print(t);
     Serial.print(" *C, ");
 
-    k1[0,1] = 0;
+    ky = 0;
     i[0] = 0;
     i[1] = 0;
     myTimer1 = millis();
   }
-  if (millis() - myTimer2 > 226505) {
+  if (rfid.serNum[0] == UID[0] and vx[0] == 1 ) {
+    while (rfid.serNum[0] == UID[0] and vx[0] == 1 ) {
+      tone(dinam, 5512, 400);
+      Serial.println("===========================================================================");
+      Serial.println(ych[0]);
+      Serial.println("");
+      Serial.println("Желаете покинуть систему досрочно?");
+      Serial.println("===========================================================================");
+      rfid.serNum[0] = 0;
+      vx[0]++;
+      delay(500);
+    }
+  }
+
+
+
+  if (rfid.serNum[0] == UID[1] and vx[1] == 1 ) {
+    while (rfid.serNum[0] == UID[0] and vx[1] == 1 ) {
+      tone(dinam, 5512, 400);
+      Serial.println("===========================================================================");
+      Serial.println(ych[1]);
+      Serial.println("");
+      Serial.println("Желаете покинуть систему досрочно?");
+      Serial.println("===========================================================================");
+      rfid.serNum[0] = 0;
+      vx[1]++;
+      delay(500);
+    }
+  }
+  if (rfid.serNum[0] == UID[0] and vx[0] == 2 ) {
+    while (rfid.serNum[0] == UID[0] and vx[0] == 2 ) {
+      tone(dinam, 2512, 400);
+      Serial.println("===========================================================================");
+      Serial.println(ych[0]);
+      Serial.println("");
+      Serial.println("Покинул систему досрочно");
+      Serial.println("===========================================================================");
+      rfid.serNum[0] = 0;
+      pg[0]++;
+      vx[0]++;
+      ky--;
+    }
+  }
+  if (rfid.serNum[0] == UID[0] and vx[0] > 2 ) {
+    while (rfid.serNum[0] == UID[0] and vx[0] > 2 ) {
+      Serial.println("===========================================================================");
+      Serial.println("");
+      if (vx[0] > 2) {
+        Serial.println(ych[0]);
+      }
+      if (vx[1] > 2) {
+        Serial.println(ych[1]);
+      }
+      Serial.println("Вы уже покинули систему");
+      Serial.println("");
+      Serial.println("===========================================================================");
+      rfid.serNum[0] = 0;
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+  if (millis() - myTimer2 > 2226505) {
     Serial.println("===========================================================================");
     Serial.println("ВЕЧЕРНИЙ ОТЧЕТ ");
     Serial.print("");
     Serial.println("Всего учеников ушло:");
-    Serial.println(k2[0+1]);
+    Serial.print(pg[0]);
     Serial.println("Ученики, которые ушли вовремя:");
-
+    Serial.println("ПЕРЕДАЧА ИНФОРМАЦИИ НА СЕРВЕР И СБРОС ПРОПУСКОВ");
+    Serial.print("НЕ ВЫКЛЮЧАЙТЕ СИСТЕМУ, ДО ЗАВЕРШЕНИЯ ЗАГРУЗКИ");
+    vg0 = 0;
+    vg1 = 0;
+    delay(1000);
+    Serial.println("ЗАГРУЗКА ЗАВЕРШЕНА");
     myTimer2 = millis();
     myTimer4 = millis();
 
-
   }
 }
+
+
+
+
+
 
 
 
