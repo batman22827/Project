@@ -1,8 +1,6 @@
 // version 1.1
 
 
-//BACKUP
-
 // Тестировалось на Arduino IDE 1.0.1
 #include <SPI.h>
 #include "DHT.h" // подключаем библиотеку
@@ -14,22 +12,29 @@
 #define DHTTYPE DHT11
 RFID rfid(SS_PIN, RST_PIN);
 uint32_t myTimer1; //Таймер
-uint32_t myTimer2; //Таймер
+uint32_t myTimer2 ; //Таймер
+uint32_t myTimer3; //Таймер
+uint32_t myTimer4 = 15000 ; //Таймер
 int dinam = 3;
-int zvyk = 1;
 int serNum0;
-int hes;
 int serNum1;
 int klass[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}; //0,1,2,3,4,5,6,7,8,9,10,11,12
+int ky[] = {0, 0}; //Утренние ученики
+int pg[] {0, 0}; //Сбежавшие ученики
+int kv[] = {0, 0};//Вечерние ученики
 int KL;
-int i1 = 0;//Круг первого
-int i2 = 0;//Круг второго
-int k = 0;//Количество учеников
+int i[] {0, 0}; //Круг утренних карточек
+int vx[] {0, 0};
+int k1[]{0,0} ;//Количество утрнних  учеников
+int k2[] {0,1}; //Количество вечерних учеников
 int UID[] = {199, 89}; //Верные айди
 int vg[] = {0, 0}; //Пропуски
 int vg0;
 int vg1;
-int kol1;
+int ky0;
+int ky1;
+int kv0;
+int kv1;
 const char *bykva[]  = {
   "А",   // 0
   "Б",     // 1
@@ -57,14 +62,12 @@ void setup()
 
 void loop()
 {
-
   Serial.print("");
-
 
   // Если обнаружена карта
   {
     if (rfid.isCard()) {
-      delay(250);
+      delay(500);
 
       // Считываем адрес
       if (rfid.readCardSerial()) {
@@ -77,8 +80,8 @@ void loop()
 
   }
 
-  if (rfid.serNum[0] == UID[0] and i1 == 0) {
-    while (rfid.serNum[0] == UID[0] and i1 == 0) {
+  if (rfid.serNum[0] == UID[0] and i[0] == 0) {
+    while (rfid.serNum[0] == UID[0] and i[0] == 0) {
       FAM = "Демченко";
       IM = "Илья";
       KL = klass[9];
@@ -88,6 +91,7 @@ void loop()
       Serial.println(" ");
       Serial.println("===========================================================================");
       Serial.println(" ");
+      Serial.println("Пришел на объект:");
       Serial.print(FAM);
       Serial.print(" ");
       Serial.print(IM);
@@ -100,15 +104,19 @@ void loop()
 
       rfid.serNum[0] = 0;
       rfid.serNum[1] = 100;
-      i1++;
-      k++;
+      i[0]++;
+      ky[0]++;
+      vx[0] = 1;
+      if(k1[0]=0){
+      k1[0]++;
+      }
     }
   }
 
 
 
-  if (rfid.serNum[0] == UID[1] and i2 == 0 ) {
-    while (rfid.serNum[0] == UID[1] and i2 == 0) {
+  if (rfid.serNum[0] == UID[1] and i[1] == 0 ) {
+    while (rfid.serNum[0] == UID[1] and i[1] == 0) {
       FAM = "Петров" ;
       IM = "Василий";
       KL = klass[5];
@@ -116,60 +124,65 @@ void loop()
       Serial.println(" ");
       Serial.println("===========================================================================");
       Serial.println(" ");
+      Serial.println("Пришел на объект:");
       Serial.print(FAM);
       Serial.print(" ");
       Serial.print(IM);
       Serial.print(" ");
       Serial.print(KL);
-      Serial.print(BK);
+      Serial.println(BK);
       Serial.println("");
       Serial.println("");
       Serial.println("===========================================================================");
       tone(dinam, 784, 150);
       rfid.serNum[0] = 0;
       rfid.serNum[1] = 100;
-      i2++;
-      k++;
+      i[1]++;
+      ky[1]++;
+      vx[1] = 1;
 
     }
 
   }
-  {
-    if (rfid.serNum[0] == UID[0] and i1 == 1 || rfid.serNum[0] == UID[1] and i2 == 1) {
-      while (rfid.serNum[0] == UID[0] and i1 == 1 || rfid.serNum[0] == UID[1] and i2 == 1) {
-        tone(dinam, 1014, 50);
-        Serial.println("===========================================================================");
-        Serial.println("Данная карта уже зарегистрирована сегодня");
-        Serial.println("===========================================================================");
 
-        rfid.serNum[0] = 0;
-        delay(150);
-      }
-    }
-  }
+  
+
+   
+
+
+    
+  
 
 
 
-
-
-
-  if (rfid.serNum[0] != UID[0 or 1] and rfid.serNum[0] > 0 ) {
-    while (rfid.serNum[0] != UID[0 or 1] and rfid.serNum[0] > 0 ) {
-      tone(dinam, 1700, 50);
-      Serial.println(" ");
-      Serial.println("===========================================================================");
-      Serial.println("Данной карты не обнаружено в системе") ;
-      Serial.println("===========================================================================");
-      rfid.serNum[0] = 0;
-    }
-  }
-
-
-  if (millis() - myTimer1 > 5500) {
+  if (millis() - myTimer1 > 55505) {
     Serial.println("===========================================================================");
+    Serial.println("УТРЕННИЙ ОТЧЕТ");
+    Serial.println("УТРЕННИЙ ОТЧЕТ");
+    Serial.println("УТРЕННИЙ ОТЧЕТ");
+
+
     float h = dht.readHumidity(); // считываем влажность
     float t = dht.readTemperature(); // считываем температуру
-    // в градусах Цельсия
+
+
+    if (t <= 20) {
+      Serial.println("Низкая температура");
+      tone(dinam, 512, 400);
+    }
+    if (t >= 30) {
+      Serial.println("Высокая температура"); {
+        tone(dinam, 1024, 800);
+      }
+    }
+    if (h < 20) {
+      Serial.println("Низкая влажность");
+      tone(dinam, 2048, 800);
+    }
+    if (h > 65) {
+      Serial.println("Высокая влажность");
+      tone(dinam, 4048, 800);
+    }
 
     // проверяем полученные значения
     if (isnan(h) || isnan(t)) {
@@ -187,21 +200,27 @@ void loop()
 
 
     Serial.println("===========================================================================");
-    if (k > 0) {
+    if (k1[0,1] > 0) {
       Serial.println("Всего учеников пришло:");
-      Serial.print(k);
+      Serial.print(k1[0+1]);
       Serial.println("");
+      if (i[0] == 1) {
+        Serial.println("Демченко Илья");
+      }
+      if (i[1] == 1) {
+        Serial.println("Петров Василий");
+      }
     }
 
     Serial.println("===========================================================================");
 
-    if (i1 == 0  or i2 == 0 ) {
+    if (i[0] == 0  or i[1] == 0 ) {
       Serial.println("Ученики, которые не пришли:");
 
 
 
     }
-    if (serNum1 == 0  and i1 == 0) {
+    if (serNum1 == 0  and i[0] == 0) {
       EEPROM.update(0, vg0 + 1);
 
 
@@ -215,7 +234,7 @@ void loop()
     }
 
 
-    if (serNum1 == 0  and i2 == 0) {
+    if (serNum1 == 0  and i[1] == 0) {
       EEPROM.update(1, vg1 + 1);
 
 
@@ -235,35 +254,30 @@ void loop()
     Serial.print("Температура: ");
     Serial.print(t);
     Serial.print(" *C, ");
-    if (t < 17) {
-      Serial.println("");
-      Serial.println("Низкая температура");
-      tone(dinam, 514, 450);
-    }
 
-
-    k = 0;
-    i1 = 0;
-    i2 = 0;
+    k1[0,1] = 0;
+    i[0] = 0;
+    i[1] = 0;
     myTimer1 = millis();
   }
-  if (millis() - myTimer2 > 105500) {
+  if (millis() - myTimer2 > 226505) {
     Serial.println("===========================================================================");
-    Serial.println("");
-    Serial.println("СБРОС ДАННЫХ О ПРОПУСКАХ");
-    Serial.println("СБРОС ДАННЫХ О ПРОПУСКАХ");
-    Serial.println("СБРОС ДАННЫХ О ПРОПУСКАХ");
-    Serial.println("");
-    Serial.println("===========================================================================");
+    Serial.println("ВЕЧЕРНИЙ ОТЧЕТ ");
+    Serial.print("");
+    Serial.println("Всего учеников ушло:");
+    Serial.println(k2[0+1]);
+    Serial.println("Ученики, которые ушли вовремя:");
 
-    vg0 = 0;
-    vg1 = 0;
-    delay(200);
     myTimer2 = millis();
-  }
+    myTimer4 = millis();
 
-  Serial.print("");
+
+  }
 }
+
+
+
+
 
 
 
