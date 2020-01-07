@@ -12,12 +12,14 @@
 #define DHTTYPE DHT11
 RFID rfid(SS_PIN, RST_PIN);
 uint32_t myTimer1; //Таймер
+uint32_t myTimer2; //Таймер отметки
 int dinam = 3;
 int serNum0;
 int serNum1;
-int ky; //Утренние ученики
+int last; //Последняя карта в системе
+int pick; //Текущая прислоненная карта
 int pg[] {0, 0}; //Сбежавшие ученики
-int kv;//Вечерние ученики
+int k; // Утренние ученики, которые пришли
 int vx[] {0, 0}; //Кол-во считываний для выхода из системы
 int UID[] = {199, 89}; //Верные айди
 int vg[] = {0, 0}; //Пропуски
@@ -55,65 +57,162 @@ void loop()
   // Если обнаружена карта
   {
     if (rfid.isCard()) {
-      delay(200);
-
+      delay(150);
       // Считываем адрес
       if (rfid.readCardSerial()) {
 
 
+}
         // Выводим его в порт в десятичном представлении
       }
     }
     rfid.halt();
-  }
+  
 
 
 
-  if (rfid.serNum[0] == UID[0] and vx[0] == 0) {
-    while (rfid.serNum[0] == UID[0] and vx[0] == 0) {
-
-
+  if (rfid.serNum[0] == UID[0] and vx[0] == 0 || rfid.serNum[0] == UID[1] and vx[1] == 0 ) {
+    while (rfid.serNum[0] == UID[0] and vx[0] == 0 || rfid.serNum[0] == UID[1] and vx[1] == 0 ) {
 
       tone(dinam, 659, 300);
       Serial.println(" ");
       Serial.println("===========================================================================");
       Serial.println(" ");
       Serial.println("Занесен в систему");
+
+
+      if (rfid.serNum[0] == UID[0] and vx[0] == 0) {
+        while (rfid.serNum[0] == UID[0] and vx[0] == 0) {
+          Serial.println(ych[0]);
+          rfid.serNum[0] = 0;
+          k++;
+          vx[0]++;
+
+        }
+      }
+      if (rfid.serNum[0] == UID[1] and vx[1] == 0) {
+        while (rfid.serNum[0] == UID[1] and vx[1] == 0) {
+          Serial.println(ych[1]);
+          rfid.serNum[0] = 0;
+          k++;
+          vx[1]++;
+        }
+      }
+      Serial.println("");
+      Serial.println("");
+      Serial.println("===========================================================================");
+    }
+  }
+if (rfid.serNum[0] == UID[0] and vx[0] == 1 ) {
+    while (rfid.serNum[0] == UID[0] and vx[0] == 1 ) {
+      tone(dinam, 212, 400);
+      Serial.println("===========================================================================");
       Serial.println(ych[0]);
       Serial.println("");
+      Serial.println("Желаете покинуть систему досрочно?");
+      Serial.println("");
+      Serial.println("Чтобы покинуть систему,");
+      Serial.print("Приложите карту еще раз");
       Serial.println("");
       Serial.println("===========================================================================");
-
       rfid.serNum[0] = 0;
-      rfid.serNum[1] = 100;
-      vx[0] = 1;
-      ky++;
+      vx[0]++;
       delay(900);
     }
   }
 
 
 
-
-
-
-  if (rfid.serNum[0] == UID[1] and vx[1] == 0 ) {
-    while (rfid.serNum[0] == UID[1] and vx[1] == 0 ) {
-
-      Serial.println(" ");
+  if (rfid.serNum[0] == UID[1] and vx[1] == 1 ) {
+    while (rfid.serNum[0] == UID[1] and vx[1] == 1 ) {
+      tone(dinam, 212, 400);
       Serial.println("===========================================================================");
-      Serial.println(" ");
-      Serial.println("Занесен в систему:");
       Serial.println(ych[1]);
+      Serial.println("");
+      Serial.println("Желаете покинуть систему досрочно?");
+      Serial.println("");
+      Serial.print("");
+      Serial.println("Чтобы покинуть систему,");
+      Serial.print("Приложите карту еще раз");
+      Serial.println("");
       Serial.println("===========================================================================");
-      tone(dinam, 784, 150);
       rfid.serNum[0] = 0;
-      rfid.serNum[1] = 100;
-      ky++;
-      vx[1] = 1;
+      vx[1]++;
       delay(900);
+      Serial.println("");
     }
   }
+  if (rfid.serNum[0] == UID[0] and vx[0] == 2 ) {
+    while (rfid.serNum[0] == UID[0] and vx[0] == 2 ) {
+      tone(dinam, 412, 400);
+      Serial.println("===========================================================================");
+      Serial.println(ych[0]);
+      Serial.println("");
+      Serial.println("Покинул систему досрочно");
+      Serial.println("===========================================================================");
+      rfid.serNum[0] = 0;
+      pg[0]++;
+      vx[0]++;
+   
+    }
+  }
+
+
+  if (rfid.serNum[0] == UID[1] and vx[1] == 2 ) {
+    while (rfid.serNum[0] == UID[1] and vx[1] == 2 ) {
+      tone(dinam, 812, 400);
+      Serial.println("===========================================================================");
+      Serial.println(ych[1]);
+      Serial.println("");
+      Serial.println("Покинул систему досрочно");
+      Serial.println("===========================================================================");
+      rfid.serNum[0] = 0;
+      pg[1]++;
+      vx[1]++;
+
+    }
+  }
+
+
+
+  if (rfid.serNum[0] == UID[0] and vx[0] > 2 or rfid.serNum[0] == UID[1] and vx[1] > 2) {
+    while (rfid.serNum[0] == UID[0] and vx[0] > 2 or rfid.serNum[0] == UID[1] and vx[1] > 2) {
+      Serial.println("===========================================================================");
+      Serial.println("");
+      if (vx[0] == 3) {
+        Serial.println(ych[0]);
+      }
+      if (vx[1] == 3) {
+        Serial.println(ych[1]);
+      }
+      Serial.println("Вы уже покинули систему");
+      Serial.println("");
+      Serial.println("===========================================================================");
+      tone(dinam, 412, 400);
+      rfid.serNum[0] = 0;
+    }
+  }
+  if(millis()- myTimer2 > 25000 ){
+  if (vx[0] == 3 ) {
+    while (vx[0] > 0 ) {
+      Serial.println("Ученики, ушедшие из школы:");
+      if (vx[0] > 0 ) {
+        Serial.println(ych[0]);
+        vx[0] = 0;
+      }
+    }
+  }
+  }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -166,19 +265,17 @@ void loop()
 
 
     Serial.println("===========================================================================");
-    if (ky > 0) {
-      Serial.println("Всего учеников пришло:");
-      Serial.println(ky);
-      Serial.println("");
-      Serial.println("Ученики, которые пришли:");
-      if (vx[0] > 0) {
-        Serial.println(ych[0]);
-      }
-      if (vx[1] > 0) {
-        Serial.println(ych[1]);
-      }
-
+    Serial.println("Всего учеников пришло:");
+    Serial.println("");
+    Serial.println("Ученики, которые пришли:");
+    if (vx[0] > 0) {
+      Serial.println(ych[0]);
     }
+    if (vx[1] > 0) {
+      Serial.println(ych[1]);
+    }
+
+
 
 
     Serial.println("===========================================================================");
@@ -228,111 +325,14 @@ void loop()
     Serial.print(t);
     Serial.print(" *C, ");
 
-    ky = 0;
+
 
     myTimer1 = millis();
   }
-  if (rfid.serNum[0] == UID[0] and vx[0] == 1 ) {
-    while (rfid.serNum[0] == UID[0] and vx[0] == 1 ) {
-      tone(dinam, 212, 400);
-      Serial.println("===========================================================================");
-      Serial.println(ych[0]);
-      Serial.println("");
-      Serial.println("Желаете покинуть систему досрочно?");
-      Serial.println("");
-      Serial.println("Чтобы покинуть систему,");
-      Serial.print("Приложите карту еще раз");
-      Serial.println("");
-      Serial.println("===========================================================================");
-      rfid.serNum[0] = 0;
-      vx[0]++;
-      delay(900);
-    }
-  }
 
 
 
-  if (rfid.serNum[0] == UID[1] and vx[1] == 1 ) {
-    while (rfid.serNum[0] == UID[1] and vx[1] == 1 ) {
-      tone(dinam, 212, 400);
-      Serial.println("===========================================================================");
-      Serial.println(ych[1]);
-      Serial.println("");
-      Serial.println("Желаете покинуть систему досрочно?");
-      Serial.println("");
-      Serial.print("");
-      Serial.println("Чтобы покинуть систему,");
-      Serial.print("Приложите карту еще раз");
-      Serial.println("");
-      Serial.println("===========================================================================");
-      rfid.serNum[0] = 0;
-      vx[1]++;
-      delay(900);
-      Serial.println("");
-    }
-  }
-  if (rfid.serNum[0] == UID[0] and vx[0] == 2 ) {
-    while (rfid.serNum[0] == UID[0] and vx[0] == 2 ) {
-      tone(dinam, 412, 400);
-      Serial.println("===========================================================================");
-      Serial.println(ych[0]);
-      Serial.println("");
-      Serial.println("Покинул систему досрочно");
-      Serial.println("===========================================================================");
-      rfid.serNum[0] = 0;
-      pg[0]++;
-      vx[0]++;
-      ky--;
-      kv--;
-    }
-  }
 
-
-  if (rfid.serNum[0] == UID[1] and vx[1] == 2 ) {
-    while (rfid.serNum[0] == UID[1] and vx[1] == 2 ) {
-      tone(dinam, 812, 400);
-      Serial.println("===========================================================================");
-      Serial.println(ych[1]);
-      Serial.println("");
-      Serial.println("Покинул систему досрочно");
-      Serial.println("===========================================================================");
-      rfid.serNum[0] = 0;
-      pg[1]++;
-      vx[1]++;
-      ky--;
-      kv--;
-    }
-  }
-
-
-
-  if (rfid.serNum[0] == UID[0] and vx[0] > 2 or rfid.serNum[0] == UID[1] and vx[1] > 2) {
-    while (rfid.serNum[0] == UID[0] and vx[0] > 2 or rfid.serNum[0] == UID[1] and vx[1] > 2) {
-      Serial.println("===========================================================================");
-      Serial.println("");
-      if (vx[0] == 3) {
-        Serial.println(ych[0]);
-      }
-      if (vx[1] == 3) {
-        Serial.println(ych[1]);
-      }
-      Serial.println("Вы уже покинули систему");
-      Serial.println("");
-      Serial.println("===========================================================================");
-      tone(dinam, 412, 400);
-      rfid.serNum[0] = 0;
-    }
-  }
-  if (vx[0] == 3 ) {
-    delay(15000);
-    while (vx[0] == 3 ) {
-      Serial.println("Ученики, ушедшие из школы:");
-      if (vx[0] == 3 ) {
-        Serial.println(ych[0]);
-        vx[0] = 0;
-      }
-    }
-  }
 }
 
 
