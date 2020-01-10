@@ -19,7 +19,7 @@ int serNum1;
 int pg[] {0, 0}; //Сбежавшие ученики
 int k; // Утренние ученики, которые пришли
 int vx[] {0, 0}; //Кол-во считываний для выхода из системы
-int UID[] = {199,89, 166 }; //Верные айди
+int UID[] = {199, 89, 166 }; //Верные айди
 int vg[] = {0, 0}; //Пропуски
 int vg0;
 int vg1;
@@ -71,38 +71,46 @@ void loop()
 
 
 
-  if (rfid.serNum[0] == UID[0] and vx[0] == 0 || rfid.serNum[0] == UID[1] and vx[1] == 0 ) {
-    while(rfid.serNum[0] == UID[0] and vx[0] == 0 || rfid.serNum[0] == UID[1] and vx[1] == 0 ){
+  if (rfid.serNum[0] == UID[0 || 1 ]) {
+    while (rfid.serNum[0] == UID[0 || 1 ]) {
 
-    tone(dinam, 659, 300);
-    Serial.println(" ");
-    Serial.println("===========================================================================");
-    Serial.println(" ");
-    Serial.println("Занесен в систему");
+      tone(dinam, 659, 300);
+      Serial.println(" ");
+      Serial.println("===========================================================================");
+      Serial.println(" ");
+      Serial.println("Занесен в систему");
 
 
-    if (rfid.serNum[0] == UID[0] and vx[0] == 0) {
-      while (rfid.serNum[0] == UID[0] and vx[0] == 0) {
-        Serial.println(ych[0]);
+      if (serNum0 == UID[0] and vx[0] == 0 ) {
+        while (serNum0 == UID[0] and vx[0] == 0 ) {
+          Serial.println(ych[0]);
+          rfid.serNum[0] = 0;
+          k++;
+          vx[0]++;
+
+        }
+      }
+      else {
+        Serial.println(ych[1]);
         rfid.serNum[0] = 0;
         k++;
-        vx[0]++;
-
+        vx[1]++;
       }
-    }
-    if (rfid.serNum[0] == UID[1] and vx[1] == 0) {
 
-      Serial.println(ych[1]);
-      rfid.serNum[0] = 0;
-      k++;
-      vx[1]++;
-    }
     }
     Serial.println("");
     Serial.println("");
     Serial.println("===========================================================================");
     return;
   }
+
+  else{
+    if(rfid.serNum[0]>0){
+      Serial.println("Данной карты нет в системе");
+      rfid.serNum[0] = 0;
+    }
+  }
+      
   if (rfid.serNum[0] == UID[0] and vx[0] == 1 ) {
 
     tone(dinam, 212, 400);
@@ -194,28 +202,28 @@ void loop()
   }
 
   if (rfid.serNum[0] == 166) {
-    while(rfid.serNum[0] == 166){
+    while (rfid.serNum[0] == 166) {
       Serial.println("");
       Serial.print("");
-    Serial.println("/*/*/*/*/*Добро пожаловать в Admin Mode /*/*/*/*/*/*/*/*/*/*/*/*/*");
-    Serial.println("Выполняется диагностика всех систем");
-    if (!isnan(h) || !isnan(t)) {
-      Serial.println("Датчики температуры и влажности работают в штатном режиме");
-      
-    }
-    Serial.println("Всего учеников пришло сегодня:");
-    Serial.println(k);
-    Serial.println("");
-    if (vx[0] > 2 || vx[1] > 2);
-    Serial.println("Ученики, которые ушли из школы:");
-    if (vx[0] > 2) {
-      Serial.println(ych[0]);
-      
-    }
-    if (vx[1] > 2 ) {
-      Serial.println(ych[1]);
-    }
-rfid.serNum[0] = 0;
+      Serial.println("/*/*/*/*/*Добро пожаловать в Admin Mode /*/*/*/*/*/*/*/*/*/*/*/*/*");
+      Serial.println("Выполняется диагностика всех систем");
+      if (!isnan(h) || !isnan(t)) {
+        Serial.println("Датчики температуры и влажности работают в штатном режиме");
+
+      }
+      Serial.println("Всего учеников пришло сегодня:");
+      Serial.println(k);
+      Serial.println("");
+      if (vx[0] > 2 || vx[1] > 2);
+      Serial.println("Ученики, которые ушли из школы:");
+      if (vx[0] > 2) {
+        Serial.println(ych[0]);
+
+      }
+      if (vx[1] > 2 ) {
+        Serial.println(ych[1]);
+      }
+      rfid.serNum[0] = 0;
     }
 
 
@@ -239,10 +247,6 @@ rfid.serNum[0] = 0;
         tone(dinam, 1024, 800);
       }
     }
-
-
-
-
 
 
     Serial.println(" ");
@@ -324,4 +328,3 @@ rfid.serNum[0] = 0;
 
   }
 }
-
