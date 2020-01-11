@@ -328,3 +328,99 @@ void loop()
 
   }
 }
+
+
+
+
+
+
+  if (millis() - myTimer1 > 15000) {
+    Serial.println("===========================================================================");
+    Serial.println("УТРЕННИЙ ОТЧЕТ");
+    Serial.println("УТРЕННИЙ ОТЧЕТ");
+    Serial.println("УТРЕННИЙ ОТЧЕТ");
+
+
+
+    if (t <= 20) {
+      Serial.println("Низкая температура");
+      tone(dinam, 512, 400);
+    }
+    if (t >= 30) {
+      Serial.println("Высокая температура"); {
+        tone(dinam, 1024, 800);
+      }
+    }
+
+
+    Serial.println(" ");
+    Serial.println(" ");
+    Serial.println("===========================================================================");
+
+
+    Serial.println("===========================================================================");
+    Serial.println("");
+    Serial.println("Ученики, которые пришли:");
+    if (vx[0] > 0) {
+      Serial.println(ych[0]);
+    }
+    if (vx[1] > 0) {
+      Serial.println(ych[1]);
+    }
+
+
+
+
+
+    Serial.println("===========================================================================");
+
+    if (vx[0] == 0  or vx[1] == 0 ) {
+      Serial.println("Ученики, которые не пришли:");
+
+      if (vx[0] == 0) {
+        Serial.println(ych[0]);
+      }
+      if (vx[1] == 0) {
+        Serial.println(ych[1]);
+      }
+
+      Serial.println("===========================================================================");
+
+    }
+    if (serNum1 == 0  and vx[0] == 0) {
+      EEPROM.update(0, vg0 + 1);
+      Serial.println("");
+      Serial.println(ych[0]);
+      Serial.println("Дней пропущено:");
+      Serial.println(EEPROM.read(0));
+      vg0++;
+      Serial.println("");
+      Serial.println("===========================================================================");
+
+    }
+
+
+    if (serNum1 == 0  and vx[1] == 0) {
+      EEPROM.update(1, vg1 + 1);
+      Serial.println(ych[1]);
+      Serial.println("Дней пропущено:");
+      Serial.println(EEPROM.read(1));
+      vg1++;
+      Serial.println("");
+      Serial.println("===========================================================================");
+
+    }
+
+
+    Serial.println("");
+    Serial.print("Влажность : ");
+    Serial.println(h);
+    Serial.print("Температура: ");
+    Serial.print(t);
+    Serial.print(" *C, ");
+
+    vx[0] = 0;
+    vx[1] = 0;
+
+    myTimer1 = millis();
+  }
