@@ -1,21 +1,21 @@
-// version 1.1
-
-
 // Тестировалось на Arduino IDE 1.0.1
 #include <SPI.h>
 #include "DHT.h" // подключаем библиотеку
 #include <RFID.h>
 #include <EEPROM.h>
+#include <iarduino_RTC.h>
+iarduino_RTC watch(RTC_DS1307);
 #define SS_PIN 10
 #define RST_PIN 9
 #define DHTPIN 6
 #define DHTTYPE DHT11
 RFID rfid(SS_PIN, RST_PIN);
-uint32_t myTimer1; //Таймер
+uint32_t myTimer2;
 int dinam = 3;
 int serNum0;
-char target[] = "reset";
+char target[] = "report";
 int serNum1;
+int v[] {5, 10, 20, 30, 40, 50, 60}; //0,1,2,3,4,5,6,7,8,9
 int pg[] {0, 0}; //Сбежавшие ученики
 int k; // Утренние ученики, которые пришли
 int vx[] {0, 0}; //Кол-во считываний для выхода из системы
@@ -29,15 +29,18 @@ const char *bykva[]  = {
   "В",     // 2
 };
 
+
 const char *ych[] = {
   "Демченко Илья Евгеньевич 10 А",//0
   "Петров Василий Михайлович 6 Б ",//1
 };
-
-
 DHT dht(DHTPIN, DHTTYPE);
+
+
+
 void setup()
 {
+
   Serial.begin(9600);
   dht.begin(); // запускаем датчик
   SPI.begin();
@@ -45,11 +48,17 @@ void setup()
   Serial.read();
   vg0 = EEPROM.read(0);
   vg1 = EEPROM.read(1);
+  watch.begin();
 }
 
 
 void loop()
 {
+  watch.gettime("d-m-Y, H:i:s, D"); // Выводим время в монитор, одной строкой
+
+
+
+
   float h = dht.readHumidity(); // считываем влажность
   float t = dht.readTemperature(); // считываем температуру
   Serial.print("");
@@ -57,7 +66,6 @@ void loop()
   // Если обнаружена карта
   {
     if (rfid.isCard()) {
-      delay(150);
       // Считываем адрес
       if (rfid.readCardSerial()) {
 
@@ -67,360 +75,230 @@ void loop()
     }
   }
   rfid.halt();
+  //-----------------------------------READER CARD AND ID----------------------------------------------//
 
-
-
-
-  if (rfid.serNum[0] == UID[0 || 1 ]) {
-    while (rfid.serNum[0] == UID[0 || 1 ]) {
-
-      tone(dinam, 659, 300);
-      Serial.println(" ");
-      Serial.println("===========================================================================");
-      Serial.println(" ");
-      Serial.println("Занесен в систему");
-
-
-      if (serNum0 == UID[0] and vx[0] == 0 ) {
-        while (serNum0 == UID[0] and vx[0] == 0 ) {
-          Serial.println(ych[0]);
-          rfid.serNum[0] = 0;
-          k++;
-          vx[0]++;
-
-        }
-      }
-      else {
-        Serial.println(ych[1]);
-        rfid.serNum[0] = 0;
-        k++;
-        vx[1]++;
-      }
-
-    }
+  if (rfid.serNum[0] == UID[0] and vx[0] == 0 || rfid.serNum[0] == UID[1] and vx[1] == 0) {
     Serial.println("");
-    Serial.println("");
-    Serial.println("===========================================================================");
-    return;
+    Serial.println("Занесен в систему");
   }
-
-  else{
-    if(rfid.serNum[0]>0){
-      Serial.println("Данной карты нет в системе");
-      rfid.serNum[0] = 0;
-    }
-  }
-      
-  if (rfid.serNum[0] == UID[0] and vx[0] == 1 ) {
-
-    tone(dinam, 212, 400);
-    Serial.println("===========================================================================");
+  if (rfid.serNum[0] == UID[0] and vx[0] == 0) {
     Serial.println(ych[0]);
     Serial.println("");
-    Serial.println("Желаете покинуть систему досрочно?");
-    Serial.println("");
-    Serial.println("Чтобы покинуть систему,");
-    Serial.print("Приложите карту еще раз");
-    Serial.println("");
-    Serial.println("===========================================================================");
+    tone(dinam, 324, 324);
     rfid.serNum[0] = 0;
+    k++;
     vx[0]++;
-    delay(900);
+    vg[0]--;
+    delay(300);
+  }
+  if (rfid.serNum[0] == UID[1] and vx[1] == 0) {
+    Serial.println(ych[1]);
+    Serial.println("");
+    tone(dinam, 324, 324);
+    rfid.serNum[0] = 0;
+    k++;
+    vx[1]++;
+    vg[1]--;
+    delay(300);
+  }
+
+
+
+  if (rfid.serNum[0] == UID[0] and vx[0] == 1 || rfid.serNum[0] == UID[1] and vx[1] == 1 ) {
+    Serial.println("Вы уже зарегистрировались в системе сегодня");
+    Serial.println("Вы желаете покинуть систему?");
+    tone(dinam, 224, 324);
+    if (rfid.serNum[0] == UID[0] and vx[0] == 1) {
+      rfid.serNum[0] = 0;
+      vx[0]++;
+      delay(300);
+      return;
+    }
+    if (rfid.serNum[0] == UID[1] and vx[1] == 1) {
+      tone(dinam, 224, 324);
+      rfid.serNum[0] = 0;
+      vx[1]++;
+      delay(300);
+      return;
+    }
+  }
+
+  if (rfid.serNum[0] == UID[0] and vx[0] == 2) {
+    Serial.println("");
+    Serial.println(ych[0]);
+    Serial.println("Вы успешно покинули систему");
+    Serial.println("");
+    rfid.serNum[0] = 0;
+    pg[0]++ ;
+    vx[0] = 0;
+    k--;
+    tone(dinam, 545, 500);
+    delay(600);
+    return;
+  }
+  if (rfid.serNum[0] == UID[1] and vx[1] == 2) {
+    Serial.println("");
+    Serial.println(ych[1]);
+    Serial.println("Вы успешно покинули систему");
+    Serial.println("");
+    rfid.serNum[0] = 0;
+    pg[1]++ ;
+    vx[1] = 0;
+    k--;
+    tone(dinam, 545, 500);
+    delay(600);
     return;
   }
 
 
 
-  if (rfid.serNum[0] == UID[1] and vx[1] == 1 ) {
-    while (rfid.serNum[0] == UID[1] and vx[1] == 1 ) {
-      tone(dinam, 212, 400);
-      Serial.println("===========================================================================");
-      Serial.println(ych[1]);
-      Serial.println("");
-      Serial.println("Желаете покинуть систему досрочно?");
-      Serial.println("");
-      Serial.print("");
-      Serial.println("Чтобы покинуть систему,");
-      Serial.print("Приложите карту еще раз");
-      Serial.println("");
-      Serial.println("===========================================================================");
-      rfid.serNum[0] = 0;
-      vx[1]++;
-      delay(900);
-      Serial.println("");
-    }
-  }
-  if (rfid.serNum[0] == UID[0] and vx[0] == 2 ) {
-    while (rfid.serNum[0] == UID[0] and vx[0] == 2 ) {
-      tone(dinam, 412, 400);
-      Serial.println("===========================================================================");
-      Serial.println(ych[0]);
-      Serial.println("");
-      Serial.println("Покинул систему досрочно");
-      Serial.println("===========================================================================");
-      rfid.serNum[0] = 0;
-      pg[0]++;
-      vx[0]++;
-
-    }
-  }
-
-
-  if (rfid.serNum[0] == UID[1] and vx[1] == 2 ) {
-    while (rfid.serNum[0] == UID[1] and vx[1] == 2 ) {
-      tone(dinam, 812, 400);
-      Serial.println("===========================================================================");
-      Serial.println(ych[1]);
-      Serial.println("");
-      Serial.println("Покинул систему досрочно");
-      Serial.println("===========================================================================");
-      rfid.serNum[0] = 0;
-      pg[1]++;
-      vx[1]++;
-
-    }
-  }
-
-
-
-  if (rfid.serNum[0] == UID[0] and vx[0] > 2 or rfid.serNum[0] == UID[1] and vx[1] > 2) {
-    while (rfid.serNum[0] == UID[0] and vx[0] > 2 or rfid.serNum[0] == UID[1] and vx[1] > 2) {
-      Serial.println("===========================================================================");
-      Serial.println("");
-      if (vx[0] == 3) {
-        Serial.println(ych[0]);
-      }
-      if (vx[1] == 3) {
-        Serial.println(ych[1]);
-      }
-      Serial.println("Вы уже покинули систему");
-      Serial.println("");
-      Serial.println("===========================================================================");
-      tone(dinam, 412, 400);
-      rfid.serNum[0] = 0;
-    }
-  }
-
-  if (rfid.serNum[0] == 166) {
-    while (rfid.serNum[0] == 166) {
-      Serial.println("");
-      Serial.print("");
-      Serial.println("/*/*/*/*/*Добро пожаловать в Admin Mode /*/*/*/*/*/*/*/*/*/*/*/*/*");
-      Serial.println("Выполняется диагностика всех систем");
-      if (!isnan(h) || !isnan(t)) {
-        Serial.println("Датчики температуры и влажности работают в штатном режиме");
-
-      }
-      Serial.println("Всего учеников пришло сегодня:");
-      Serial.println(k);
-      Serial.println("");
-      if (vx[0] > 2 || vx[1] > 2);
-      Serial.println("Ученики, которые ушли из школы:");
-      if (vx[0] > 2) {
-        Serial.println(ych[0]);
-
-      }
-      if (vx[1] > 2 ) {
-        Serial.println(ych[1]);
-      }
-      rfid.serNum[0] = 0;
-    }
-
-
-  }
-
-
-  if (millis() - myTimer1 > 15000) {
-    Serial.println("===========================================================================");
-    Serial.println("УТРЕННИЙ ОТЧЕТ");
-    Serial.println("УТРЕННИЙ ОТЧЕТ");
-    Serial.println("УТРЕННИЙ ОТЧЕТ");
-
-
-
-    if (t <= 20) {
-      Serial.println("Низкая температура");
-      tone(dinam, 512, 400);
-    }
-    if (t >= 30) {
-      Serial.println("Высокая температура"); {
-        tone(dinam, 1024, 800);
-      }
-    }
-
-
-    Serial.println(" ");
-    Serial.println(" ");
-    Serial.println("===========================================================================");
-
-
-    Serial.println("===========================================================================");
+  if (rfid.serNum[0] != UID[0 or 1 or 2] and rfid.serNum[0] > 0) {
     Serial.println("");
-    Serial.println("Ученики, которые пришли:");
-    if (vx[0] > 0) {
+    Serial.println("Данной карты нет в системе");
+    Serial.println("");
+  }
+
+
+  //-----------------------------------ADMIN MODE----------------------------------------------//
+  if (rfid.serNum[0] == UID[2]) {
+    tone(dinam, 133, 333);
+    delay(15);
+    tone(dinam, 266, 333);
+    Serial.println("");
+    Serial.print("");
+    Serial.println("");
+    Serial.println("/*/*Добро пожаловать в Admin Mode /*/*");
+    Serial.println("Выполняется диагностика всех систем");
+    float h = dht.readHumidity(); // считываем влажность
+    float t = dht.readTemperature(); // считываем температур
+    if (!isnan(h) || !isnan(t)) {
+      Serial.println("Датчики температуры и влажности работают в штатном режиме");
+
+    }
+    if (k > 0) {
+      Serial.println("Учеников пришло сегодня:");
+      Serial.println(k);
+      Serial.println("Ученики, которые пришли: ");
+      if (vx[0] > 0) {
+        Serial.println(ych[0]);
+      }
+      if (vx[1] > 0) {
+        Serial.println(ych[1]);
+      }
+    }
+    else
+    {
+      Serial.println("Пока что никто не пришел");
+    }
+    Serial.println("");
+    Serial.println("Ученики, которые не пришли:");
+
+    if (vx[0] == 0) {
+      Serial.println("");
       Serial.println(ych[0]);
+      Serial.println("Дней пропущено: ");
+      Serial.println(EEPROM.read(0));
+      Serial.println("");
     }
-    if (vx[1] > 0) {
+    if (vx[1] == 0) {
+      Serial.println("");
       Serial.println(ych[1]);
+      Serial.println("Дней пропущено: ");
+      Serial.println(EEPROM.read(1));
+      Serial.println("");
     }
 
+    if (pg[0] > 0 or pg[1] > 0) {
+      Serial.println("Ученики, которые ушли");
+      if (pg[0] > 0) {
+        Serial.println(ych[0]);
+      }
+    }
+    Serial.println("");
+    rfid.serNum[0] = 0;
+    return;
+  }
 
+  //----------------------------------------------//
 
+  //---------------------TIMER INFO-------------------------//
+  if (watch.minutes == v[0] or watch.minutes == v[1] or watch.minutes == v[2] or watch.minutes == v[3] or watch.minutes == v[4] or watch.minutes == v[5] or watch.minutes == v[6] && watch.seconds==0 ) {
+    Serial.println(watch.gettime("d-m-Y, H:i:s, D"));
+    Serial.println("");
+    Serial.println("");
+    Serial.println("Утренний отчет");
+    Serial.println("");
+    if (k > 0) {
+      Serial.println("Учеников пришло сегодня:");
+      Serial.println(k);
+      Serial.println("Ученики, которые пришли: ");
+      if (vx[0] > 0) {
+        Serial.println(ych[0]);
+      }
+      if (vx[1] > 0) {
+        Serial.println(ych[1]);
+      }
+    }
+    else
+    {
+      Serial.println("Никто не пришел");
+    }
 
-
-    Serial.println("===========================================================================");
 
     if (vx[0] == 0  or vx[1] == 0 ) {
+      Serial.println("");
       Serial.println("Ученики, которые не пришли:");
 
-      if (vx[0] == 0) {
+
+
+      if (serNum1 == 0  and vx[0] == 0) {
+        EEPROM.update(0, vg0 + 1);
+        Serial.println("");
         Serial.println(ych[0]);
+        Serial.println("Дней пропущено:");
+        Serial.println(EEPROM.read(0));
+        vg0++;
+        Serial.println("");
+        Serial.println("");
       }
-      if (vx[1] == 0) {
+
+
+      if (serNum1 == 0  and vx[1] == 0) {
+        EEPROM.update(1, vg1 + 1);
         Serial.println(ych[1]);
+        Serial.println("Дней пропущено:");
+        Serial.println(EEPROM.read(1));
+        vg1++;
+        Serial.println("");
       }
-
-      Serial.println("===========================================================================");
-
     }
-    if (serNum1 == 0  and vx[0] == 0) {
-      EEPROM.update(0, vg0 + 1);
-      Serial.println("");
-      Serial.println(ych[0]);
-      Serial.println("Дней пропущено:");
-      Serial.println(EEPROM.read(0));
-      vg0++;
-      Serial.println("");
-      Serial.println("===========================================================================");
-
-    }
-
-
-    if (serNum1 == 0  and vx[1] == 0) {
-      EEPROM.update(1, vg1 + 1);
-      Serial.println(ych[1]);
-      Serial.println("Дней пропущено:");
-      Serial.println(EEPROM.read(1));
-      vg1++;
-      Serial.println("");
-      Serial.println("===========================================================================");
-
-    }
-
-
-    Serial.println("");
-    Serial.print("Влажность : ");
+    Serial.print("Влажность: ");
     Serial.println(h);
     Serial.print("Температура: ");
     Serial.print(t);
     Serial.print(" *C, ");
+    watch.gettime("d-m-Y, H:i:s, D");
+    delay(200);
+    return;
 
+  }
+
+
+
+
+  if (Serial.find(target)) {
+    Serial.println("Вечерний отчет");
+    Serial.println("");
+    Serial.println("Учеников было в школе: ");
+    Serial.println(k);
+    Serial.println("");
+    pg[0] = 0;
+    pg[1] = 0;
     vx[0] = 0;
     vx[1] = 0;
 
-    myTimer1 = millis();
   }
-  if (Serial.available() > 0) {
-    if (Serial.find(target))
-      Serial.println("Сброс пропусков");
-    vg0 = 0;
-    vg1 = 0;
 
-  }
 }
 
-
-
-
-
-
-  if (millis() - myTimer1 > 15000) {
-    Serial.println("===========================================================================");
-    Serial.println("УТРЕННИЙ ОТЧЕТ");
-    Serial.println("УТРЕННИЙ ОТЧЕТ");
-    Serial.println("УТРЕННИЙ ОТЧЕТ");
-
-
-
-    if (t <= 20) {
-      Serial.println("Низкая температура");
-      tone(dinam, 512, 400);
-    }
-    if (t >= 30) {
-      Serial.println("Высокая температура"); {
-        tone(dinam, 1024, 800);
-      }
-    }
-
-
-    Serial.println(" ");
-    Serial.println(" ");
-    Serial.println("===========================================================================");
-
-
-    Serial.println("===========================================================================");
-    Serial.println("");
-    Serial.println("Ученики, которые пришли:");
-    if (vx[0] > 0) {
-      Serial.println(ych[0]);
-    }
-    if (vx[1] > 0) {
-      Serial.println(ych[1]);
-    }
-
-
-
-
-
-    Serial.println("===========================================================================");
-
-    if (vx[0] == 0  or vx[1] == 0 ) {
-      Serial.println("Ученики, которые не пришли:");
-
-      if (vx[0] == 0) {
-        Serial.println(ych[0]);
-      }
-      if (vx[1] == 0) {
-        Serial.println(ych[1]);
-      }
-
-      Serial.println("===========================================================================");
-
-    }
-    if (serNum1 == 0  and vx[0] == 0) {
-      EEPROM.update(0, vg0 + 1);
-      Serial.println("");
-      Serial.println(ych[0]);
-      Serial.println("Дней пропущено:");
-      Serial.println(EEPROM.read(0));
-      vg0++;
-      Serial.println("");
-      Serial.println("===========================================================================");
-
-    }
-
-
-    if (serNum1 == 0  and vx[1] == 0) {
-      EEPROM.update(1, vg1 + 1);
-      Serial.println(ych[1]);
-      Serial.println("Дней пропущено:");
-      Serial.println(EEPROM.read(1));
-      vg1++;
-      Serial.println("");
-      Serial.println("===========================================================================");
-
-    }
-
-
-    Serial.println("");
-    Serial.print("Влажность : ");
-    Serial.println(h);
-    Serial.print("Температура: ");
-    Serial.print(t);
-    Serial.print(" *C, ");
-
-    vx[0] = 0;
-    vx[1] = 0;
-
-    myTimer1 = millis();
-  }
+//----------------------------------------------//
