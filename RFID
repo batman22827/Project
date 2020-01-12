@@ -13,9 +13,10 @@ RFID rfid(SS_PIN, RST_PIN);
 uint32_t myTimer2;
 int dinam = 3;
 int serNum0;
+int i;
 char target[] = "report";
 int serNum1;
-int v[] {5, 10, 20, 30, 40, 50, 60}; //0,1,2,3,4,5,6,7,8,9
+int v[] {21,22,23,24}; //0,1,2,3,4,5,6,
 int pg[] {0, 0}; //Сбежавшие ученики
 int k; // Утренние ученики, которые пришли
 int vx[] {0, 0}; //Кол-во считываний для выхода из системы
@@ -175,54 +176,18 @@ void loop()
       Serial.println("Датчики температуры и влажности работают в штатном режиме");
 
     }
-    if (k > 0) {
-      Serial.println("Учеников пришло сегодня:");
-      Serial.println(k);
-      Serial.println("Ученики, которые пришли: ");
-      if (vx[0] > 0) {
-        Serial.println(ych[0]);
-      }
-      if (vx[1] > 0) {
-        Serial.println(ych[1]);
-      }
-    }
-    else
-    {
-      Serial.println("Пока что никто не пришел");
-    }
-    Serial.println("");
-    Serial.println("Ученики, которые не пришли:");
 
-    if (vx[0] == 0) {
-      Serial.println("");
-      Serial.println(ych[0]);
-      Serial.println("Дней пропущено: ");
-      Serial.println(EEPROM.read(0));
-      Serial.println("");
-    }
-    if (vx[1] == 0) {
-      Serial.println("");
-      Serial.println(ych[1]);
-      Serial.println("Дней пропущено: ");
-      Serial.println(EEPROM.read(1));
-      Serial.println("");
-    }
-
-    if (pg[0] > 0 or pg[1] > 0) {
-      Serial.println("Ученики, которые ушли");
-      if (pg[0] > 0) {
-        Serial.println(ych[0]);
-      }
-    }
-    Serial.println("");
     rfid.serNum[0] = 0;
+    i = 1;
     return;
   }
 
   //----------------------------------------------//
 
   //---------------------TIMER INFO-------------------------//
-  if (watch.minutes == v[0] or watch.minutes == v[1] or watch.minutes == v[2] or watch.minutes == v[3] or watch.minutes == v[4] or watch.minutes == v[5] or watch.minutes == v[6] && watch.seconds==0 ) {
+  if(watch.minutes == v[0] or watch.minutes == v[1] or watch.minutes == v[2] or watch.minutes == v[3] or watch.minutes == v[4] or watch.minutes == v[5] or watch.minutes == v[6] && watch.seconds==1) {
+    while(watch.minutes == v[0] or watch.minutes == v[1] or watch.minutes == v[2] or watch.minutes == v[3] or watch.minutes == v[4] or watch.minutes == v[5] or watch.minutes == v[6] && watch.seconds==1){
+
     Serial.println(watch.gettime("d-m-Y, H:i:s, D"));
     Serial.println("");
     Serial.println("");
@@ -277,28 +242,13 @@ void loop()
     Serial.print("Температура: ");
     Serial.print(t);
     Serial.print(" *C, ");
-    watch.gettime("d-m-Y, H:i:s, D");
-    delay(200);
+    watch.seconds = 0;
+    delay(1000);
     return;
-
   }
+  
 
-
-
-
-  if (Serial.find(target)) {
-    Serial.println("Вечерний отчет");
-    Serial.println("");
-    Serial.println("Учеников было в школе: ");
-    Serial.println(k);
-    Serial.println("");
-    pg[0] = 0;
-    pg[1] = 0;
-    vx[0] = 0;
-    vx[1] = 0;
-
-  }
-
+}
 }
 
 //----------------------------------------------//
