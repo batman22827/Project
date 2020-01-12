@@ -188,9 +188,8 @@ void loop()
   //----------------------------------------------//
 
   //---------------------TIMER INFO-------------------------//
-  if(watch.minutes == v[0] or watch.minutes == v[1] or watch.minutes == v[2] or watch.minutes == v[3] or watch.minutes == v[4] or watch.minutes == v[5] or watch.minutes == v[6] && watch.seconds==1) {
-    while(watch.minutes == v[0] or watch.minutes == v[1] or watch.minutes == v[2] or watch.minutes == v[3] or watch.minutes == v[4] or watch.minutes == v[5] or watch.minutes == v[6] && watch.seconds==1){
-
+  if(watch.minutes == v[0] or watch.minutes == v[1] or watch.minutes == v[2] or watch.minutes == v[3] or watch.minutes == v[4] or watch.minutes == v[5] or watch.minutes == v[6] and watch.seconds==1) {
+   while(watch.seconds==1){
     Serial.println(watch.gettime("d-m-Y, H:i:s, D"));
     Serial.println("");
     Serial.println("");
@@ -246,9 +245,9 @@ void loop()
     Serial.print(t);
     Serial.print(" *C, ");
     delay(1000);
-    return;
+   }
   }
-}
+
 
 
 if (Serial.find(target) or i == 1 ) { 
@@ -305,7 +304,9 @@ if (Serial.find(target) or i == 1 ) {
     vx[0] = 0;
     vx[1] = 0;
     i = 0;
+    delay(100);
     return;
+   
 
   }
 
