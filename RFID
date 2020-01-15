@@ -157,6 +157,7 @@ void loop()
     Serial.println("");
     Serial.println("Данной карты нет в системе");
     Serial.println("");
+    tone(dinam, 124, 324);
     rfid.serNum[0] = 0;
     delay(180);
     return;
@@ -251,6 +252,7 @@ void loop()
 
 
 if (Serial.find(target) or i == 1 ) { 
+   Serial.println(watch.gettime("d-m-Y, H:i:s, D"));
     Serial.println("");
     Serial.println("Утренний отчет");
     if (k > 0) {
@@ -299,13 +301,20 @@ if (Serial.find(target) or i == 1 ) {
     Serial.println("Учеников было в школе: ");
     Serial.println(k);
     Serial.println("");
+     Serial.print("Влажность: ");
+    Serial.println(h);
+    Serial.print("Температура: ");
+    Serial.print(t);
+    Serial.print(" *C, ");
     pg[0] = 0;
     pg[1] = 0;
     vx[0] = 0;
     vx[1] = 0;
     i = 0;
+    
     delay(100);
     return;
+    
    
 
   }
